@@ -7,74 +7,6 @@
  As a result, the lessons for this function will pass *and* it will be available
  for you to use if you need it!
  */
-const employees = ['mo', 'ba']
-
-const createEmployeeRecord = (employees) => {
-    const newObj = {
-        firstName: employees[0],
-        familyName: employees[1],
-        title: employees[2],
-        payPerHour: employees[3],
-        timeInEvents: [],
-        timeOutEvents: []
-    }
-    return newObj
-}
-
-const createEmployeeRecords = (employees) => {
-    // console.log('arrayEmp', arrayEmp);
-    //.length
-    let newArr = employees.map(
-        function(employees) {
-            return createEmployeeRecord(employees)
-
-        })
-    return newArr
-
-}
-const createTimeInEvent = function(dateStamp) {
-
-    const [date, hour] = dateStamp.split(' ')
-        //   console.log('hour:', hour);
-        //   console.log('date:', date);
-    const inEvent = {
-        type: 'TimeIn',
-        hour: parseInt(hour),
-        date: date
-    }
-    this.timeInEvents.push(inEvent)
-    return this
-}
-
-
-const createTimeOutEvent = function(dateStamp) {
-    const [date, hour] = dateStamp.split(' ')
-        //   console.log('hour:', hour);
-        //   console.log('date:', date);
-    const OutEvent = {
-        type: 'TimeOut',
-        hour: parseInt(hour),
-        date: date
-    }
-    this.timeOutEvents.push(OutEvent)
-    return this
-}
-
-function hoursWorkedOnDate(workDate) {
-
-    let inTime = this.timeInEvents.filter((elmt) => elmt.date === workDate).map((element) => element.hour);
-
-    let outTime = this.timeOutEvents.filter((elmt) => elmt.date === workDate).map((element) => element.hour);
-
-    //  .map((elmt)=>elmt.hour)
-    //given a date, find # of hours worked between Out and in
-    return (outTime - inTime) / 100;
-}
-
-const wagesEarnedOnDate = function(workDate) {
-    return hoursWorkedOnDate.call(this, workDate) * this.payPerHour
-}
-
 
 const allWagesFor = function() {
     const eligibleDates = this.timeInEvents.map(function(e) {
@@ -87,15 +19,60 @@ const allWagesFor = function() {
 
     return payable
 }
+const createEmployeeRecord = function(recArray) {
+    return {
+        firstName: recArray[0],
+        familyName: recArray[1],
+        title: recArray[2],
+        payPerHour: recArray[3],
+        timeInEvents: [],
+        timeOutEvents: []
+    };
+};
 
-const findEmployeeByFirstName = function(srcArray, firstName) {
+const createEmployeeRecords = function(recsArray) {
+    return recsArray.map(rec => createEmployeeRecord(rec));
+};
 
+const createTimeInEvent = function(datestamp) {
+    let [date, hour] = datestamp.split(' ');
+    this.timeInEvents.push({
+        type: 'TimeIn',
+        hour: parseInt(hour),
+        date: date
+    });
+    return this
+};
 
-    return srcArray.find(rec => rec.firstName == firstName)
-}
+const createTimeOutEvent = function(datestamp) {
+    let [date, hour] = datestamp.split(' ');
+    this.timeOutEvents.push({
+        type: 'TimeOut',
+        hour: parseInt(hour),
+        date: date
+    });
+    return this
+};
 
-const calculatePayroll = function(recArray) {
-    return recArray.reduce((total, record) => {
-        return total + allWagesFor.call(record)
-    }, 0)
+const hoursWorkedOnDate = function(date) {
+    const inEvent = this.timeInEvents.find(inEvent => inEvent.date === date);
+    const outEvent = this.timeOutEvents.find(outEvent => outEvent.date === date);
+    return ((outEvent.hour - inEvent.hour) / 100)
+};
+
+const wagesEarnedOnDate = function(date) {
+    return hoursWorkedOnDate.apply(this, [date]) * this.payPerHour
+};
+const findEmployeeByFirstName = function(srcArray, targetName) {
+    for (let i = 0; i < srcArray.length; i++) {
+        if (srcArray[i].firstName === targetName) {
+            return srcArray[i]
+        }
+    }
+};
+
+const calculatePayroll = function(recsArray) {
+    let payroll = []
+    recsArray.forEach(element => payroll.push(allWagesFor.call(element)))
+    return payroll.reduce((a, b) => { return a + b })
 }
